@@ -159,6 +159,13 @@
 // MARK: - MBA Methods - BleClient lifecycle
 
 - (void)createClient:(FlutterMethodCall *)call result:(FlutterResult)result {
+    if(_adapter != nil) {
+        [_adapter stopDeviceScan];
+        [self.scanningStreamHandler onComplete];
+        [_adapter invalidate];
+        _adapter = nil;
+    }
+
     _adapter = [BleAdapterFactory getNewAdapterWithQueue:dispatch_get_main_queue()
                                     restoreIdentifierKey:[ArgumentHandler stringOrNil:call.arguments[ARGUMENT_KEY_RESTORE_STATE_IDENTIFIER]]];
     _adapter.delegate = self;

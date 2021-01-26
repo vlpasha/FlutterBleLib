@@ -122,6 +122,14 @@ public class FlutterBleLibPlugin implements MethodCallHandler {
     }
 
     private void createClient(MethodCall call, Result result) {
+        if (bleAdapter != null) {
+            bleAdapter.destroyClient();
+            scanningStreamHandler.onComplete();
+            connectionStateStreamHandler.onComplete();
+            bleAdapter = null;
+            delegates.clear();
+        }
+
         setupAdapter(context);
         bleAdapter.createClient(call.<String>argument(ArgumentKey.RESTORE_STATE_IDENTIFIER),
                 new OnEventCallback<String>() {
@@ -135,6 +143,7 @@ public class FlutterBleLibPlugin implements MethodCallHandler {
                         restoreStateStreamHandler.onRestoreEvent(restoreStateIdentifier);
                     }
                 });
+
         result.success(null);
     }
 
